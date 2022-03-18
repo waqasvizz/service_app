@@ -1,0 +1,148 @@
+Line no fefefefe@
+Stripe\Charge Object
+(
+    [id] => ch_3KZVuZCf3UzgQFiu1u9W2DSj
+    [object] => charge
+    [amount] => 1200
+    [amount_captured] => 1200
+    [amount_refunded] => 0
+    [application] => 
+    [application_fee] => 
+    [application_fee_amount] => 
+    [balance_transaction] => txn_3KZVuZCf3UzgQFiu1YE7CFXj
+    [billing_details] => Stripe\StripeObject Object
+        (
+            [address] => Stripe\StripeObject Object
+                (
+                    [city] => 
+                    [country] => 
+                    [line1] => 
+                    [line2] => 
+                    [postal_code] => 
+                    [state] => 
+                )
+
+            [email] => 
+            [name] => 
+            [phone] => 
+        )
+
+    [calculated_statement_descriptor] => DANISH HUSSAIN
+    [captured] => 1
+    [created] => 1646380251
+    [currency] => usd
+    [customer] => cus_LFhOk49hATTHUT
+    [description] => Payment Successful
+    [destination] => 
+    [dispute] => 
+    [disputed] => 
+    [failure_code] => 
+    [failure_message] => 
+    [fraud_details] => Array
+        (
+        )
+
+    [invoice] => 
+    [livemode] => 
+    [metadata] => Stripe\StripeObject Object
+        (
+        )
+
+    [on_behalf_of] => 
+    [order] => 
+    [outcome] => Stripe\StripeObject Object
+        (
+            [network_status] => approved_by_network
+            [reason] => 
+            [risk_level] => normal
+            [risk_score] => 53
+            [seller_message] => Payment complete.
+            [type] => authorized
+        )
+
+    [paid] => 1
+    [payment_intent] => 
+    [payment_method] => card_1KZBzTCf3UzgQFiuW4qOQzvJ
+    [payment_method_details] => Stripe\StripeObject Object
+        (
+            [card] => Stripe\StripeObject Object
+                (
+                    [brand] => visa
+                    [checks] => Stripe\StripeObject Object
+                        (
+                            [address_line1_check] => 
+                            [address_postal_code_check] => 
+                            [cvc_check] => 
+                        )
+
+                    [country] => US
+                    [exp_month] => 8
+                    [exp_year] => 2022
+                    [fingerprint] => fN45gkfBPZmIIpnT
+                    [funding] => credit
+                    [installments] => 
+                    [last4] => 4242
+                    [network] => visa
+                    [three_d_secure] => 
+                    [wallet] => 
+                )
+
+            [type] => card
+        )
+
+    [receipt_email] => 
+    [receipt_number] => 
+    [receipt_url] => https://pay.stripe.com/receipts/acct_1KYQFDCf3UzgQFiu/ch_3KZVuZCf3UzgQFiu1u9W2DSj/rcpt_LG1ywdN8nOCMVfKIZFhjY7PZI9glrBd
+    [refunded] => 
+    [refunds] => Stripe\Collection Object
+        (
+            [object] => list
+            [data] => Array
+                (
+                )
+
+            [has_more] => 
+            [total_count] => 0
+            [url] => /v1/charges/ch_3KZVuZCf3UzgQFiu1u9W2DSj/refunds
+        )
+
+    [review] => 
+    [shipping] => 
+    [source] => Stripe\Card Object
+        (
+            [id] => card_1KZBzTCf3UzgQFiuW4qOQzvJ
+            [object] => card
+            [address_city] => 
+            [address_country] => 
+            [address_line1] => 
+            [address_line1_check] => 
+            [address_line2] => 
+            [address_state] => 
+            [address_zip] => 
+            [address_zip_check] => 
+            [brand] => Visa
+            [country] => US
+            [customer] => cus_LFhOk49hATTHUT
+            [cvc_check] => 
+            [dynamic_last4] => 
+            [exp_month] => 8
+            [exp_year] => 2022
+            [fingerprint] => fN45gkfBPZmIIpnT
+            [funding] => credit
+            [last4] => 4242
+            [metadata] => Stripe\StripeObject Object
+                (
+                )
+
+            [name] => 
+            [tokenization_method] => 
+        )
+
+    [source_transfer] => 
+    [statement_descriptor] => 
+    [statement_descriptor_suffix] => 
+    [status] => succeeded
+    [transfer_data] => 
+    [transfer_group] => 
+)
+@@@@
