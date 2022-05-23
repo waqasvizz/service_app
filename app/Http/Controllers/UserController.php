@@ -68,9 +68,9 @@ class UserController extends Controller
     }
 
     public function profile()
-    {
+    {   
        $user = Auth::user();
-       $roles = Role::getRoles();
+       $roles = $this->RoleObj->get();  
         return view('user.profile',compact('user','roles'));
     }    
     
@@ -264,8 +264,11 @@ class UserController extends Controller
             // without ajax data here
         }
 
-        $data['users'] = $this->UserObj->getUser($posted_data);
+    
+        $user = $this->UserObj->getUser($posted_data);
 
+        $data['users'] = $user;
+        
         if (isset($posted_data['role']) && $posted_data['role'] == 1 )
             $data['users_mode'] = 'Admin';
         else if (isset($posted_data['role']) && $posted_data['role'] == 2 )

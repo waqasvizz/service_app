@@ -131,13 +131,14 @@ class User extends Authenticatable
         }
         // $query->select('users.*', 'users.id as user_id', 'payments.*', 'payments.id as payment_id', 'roles.name as role_name');
         
-        $query->getQuery()->orders = null;
+        // $query->getQuery()->orders = null;
         if (isset($posted_data['orderBy_name'])) {
             $query->orderBy($posted_data['orderBy_name'], $posted_data['orderBy_value']);
         } else {
             $query->orderBy('users.id', 'ASC');
         }
-
+        
+        $query =  $query->orderByDesc('created_at');
         if (isset($posted_data['paginate'])) {
             $result = $query->paginate($posted_data['paginate']);
         } else {
