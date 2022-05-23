@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Payment;
 use App\Models\Setting;
 use Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class StripeGateway implements PaymentGatewayInterface
 // class StripeGateway extends Controller
@@ -26,11 +27,11 @@ class StripeGateway implements PaymentGatewayInterface
         $response = $settings->detailSetting(1);
 
         if ($response->stripe_mode == 'test') {
-            $STRIPE_KEY = $response->stpk;
-            $STRIPE_SECRET = $response->stsk;
+            $STRIPE_KEY = Crypt::decryptString($response->stpk);
+            $STRIPE_SECRET = Crypt::decryptString($response->stsk);
         } else {
-            $STRIPE_KEY = $response->slpk;
-            $STRIPE_SECRET = $response->slsk;
+            $STRIPE_KEY = Crypt::decryptString($response->slpk);
+            $STRIPE_SECRET = Crypt::decryptString($response->slsk);
         }
         $stripe = new \Stripe\StripeClient($STRIPE_SECRET);
         return $stripe;

@@ -20,13 +20,14 @@
                     <tr>
                         <th>Sr #</th>
                         <th>Title</th>
+                        <th>Task Completion Date</th>
                         <th>Description</th>
                         <th>Service</th>
                         <th>Customer</th>
                         <th>Price</th>
-                        <th>Pay With</th>
+                        {{--<th>Pay With</th>--}}
                         <th>Status</th>
-                        <th>Actions</th>
+                        {{--<th>Actions</th>--}}
                     </tr>
                 </thead>
                 <tbody>
@@ -49,23 +50,24 @@
                         @endphp
                             <tr>
                                 <td>{{ $sr_no }}</td>
-                                {{-- <td><div class="display_images"><a data-fancybox="demo" data-src="{{ is_image_exist($item['profile_image']) }}"><img title="{{ $item['name'] }}" src="{{ is_image_exist($item['profile_image']) }}" height="100"></a></div></td> --}}
-                                <td>{{ $item['title'] }}</td>
-                                <td>{{ $item['description'] }}</td>
-                                <td>{{ $item['service_name'] }}</td>
-                                <td>{{ $item['customer_name'] }}</td>
-                                <td>{{ $item['price'] }}</td>
-                                <td>{{ get_gayment_name($item['pay_with']) }}</td>
-                                <td>{{ get_status_name($item['status']) }}</td>
-                                {{-- <td><span style="color: {{ $user_role_color }}">{{ $item['role_name'] }}</span></td> --}}
-                                {{-- <td>{{ date('M d, Y H:i A', strtotime($item['created_at'])) }}</td> --}}
-                                <td>
+                                {{-- <td><div class="display_images"><a data-fancybox="demo" data-src="{{ is_image_exist($item->profile_image) }}"><img title="{{ $item->name }}" src="{{ is_image_exist($item->profile_image) }}" height="100"></a></div></td> --}}
+                                <td>{{ $item->title }}</td>
+                                <td>{{ date('M d, Y', strtotime($item->task_completion_date)) }}</td>
+                                <td>{{ $item->description }}</td>
+                                <td>{{ $item->service->service_name }}</td>
+                                <td>{{ $item->customer->name }}</td>
+                                <td>${{ $item->price }}</td>
+                                {{--<td>{{ get_gayment_name($item->pay_with) }}</td>--}}
+                                <td>{{ get_status_name($item->status) }}</td>
+                                {{-- <td><span style="color: {{ $user_role_color }}">{{ $item->role_name }}</span></td> --}}
+                                {{-- <td>{{ date('M d, Y H:i A', strtotime($item->created_at)) }}</td> --}}
+                                {{--<td>
                                     <div class="dropdown">
                                         <button type="button" class="btn btn-sm dropdown-toggle hide-arrow waves-effect waves-float waves-light" data-toggle="dropdown">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                         </button>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="{{ url('post')}}/{{$item['id']}}/edit">
+                                            <a class="dropdown-item" href="{{ url('post')}}/{{$item->id}}/edit">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2 mr-50"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
                                                 <span>Edit</span>
                                             </a>
@@ -76,7 +78,7 @@
                                             </a>
                                         </div>
                                     </div>
-                                </td>
+                                </td>--}}
                             </tr>
                         @endforeach
                     @endif

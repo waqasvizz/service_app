@@ -9,9 +9,22 @@ class Bid extends Model
 {
     use HasFactory;
 
+    public function user(){
+        return $this->belongsTo('App\Models\User', 'provider_id')->with('role');
+    }
+
+    public function post(){
+        return $this->belongsTo('App\Models\Post')->with('service')->with('customer');
+    }
+
+    // public function post(){
+    //     return $this->belongsTo('App\Models\Post');
+    // }
+
     public function getBids($posted_data = array())
     {
-        $query = Bid::latest();
+        // $query = Bid::latest();
+        $query = Bid::with('user')->with('post');
 
         if (isset($posted_data['bid_id'])) {
             $query = $query->where('bids.id', $posted_data['bid_id']);
@@ -25,7 +38,13 @@ class Bid extends Model
         if (isset($posted_data['price'])) {
             $query = $query->where('bids.price', $posted_data['price']);
         }
-        $query->select('bids.*');
+        if (isset($posted_data['service_id'])) {
+            $query = $query->where('posts.service_id', $posted_data['service_id']);
+        }
+        
+        $query->leftjoin('posts', 'posts.id', '=', 'bids.post_id');
+
+        $query->select('bids.*', 'posts.id', 'posts.service_id', 'posts.customer_id', );
         
         $query->getQuery()->orders = null;
         if (isset($posted_data['orderBy_name'])) {
@@ -45,10 +64,71 @@ class Bid extends Model
                 $result = $query->get()->ToArray();
             } else {
                 $result = $query->get();
-            }
+            }            
         }
+
+        // $result = $query->toSql();
+        
+        // echo "Line no @"."<br>";
+        // echo "<pre>";
+        // print_r($result);
+        // echo "</pre>";
+        // exit("@@@@");
+            
+        // $newResult = Bid::associateRecords($result, $posted_data);
+        // $result = $result->toArray();
+        // if (isset($posted_data['paginate'])) {
+        //     $result['data'] = $newResult;
+        // }else{
+        //     $result = $newResult;
+        // }
         return $result;
     }
+    
+    // public function associateRecords($result_ary, $posted_data)
+    // {
+    //     $res = array();
+    //     if($result_ary){
+    //         $result_ary = $result_ary->toArray();
+    //         if (isset($posted_data['paginate'])) {
+    //             $result_ary = $result_ary['data'];
+    //         }else if (isset($posted_data['detail'])) {
+    //             $conv_result_ary[] = $result_ary;
+    //             $result_ary = $conv_result_ary;
+    //         }
+                
+    //         if(isset($result_ary) && count($result_ary)>0){
+    //             foreach($result_ary as $record){
+    //                 $Bid = Bid::find($record['id']);
+
+    //                 $user = User::getUser([
+    //                     'id'=> $record['provider_id'],
+    //                     'detail'=> true,
+    //                 ]);
+
+    //                 $post = Post::getPost([
+    //                     'id'=> $record['post_id'],
+    //                     'detail'=> true,
+    //                 ]);
+                    
+    //                 $Bid->user()->associate($user);
+    //                 $Bid->post()->associate($post);
+                    
+    //                 $Bid['provider'] = $Bid['user_id'];
+    //                 $Bid['post'] = $Bid['post_id'];
+    //                 $Bid['post_id'] = $Bid['post']['id'];
+    //                 unset($Bid['user_id']);
+    //                 if (isset($posted_data['detail'])) {
+    //                     $res = $Bid->toArray();
+    //                 }else{
+    //                     $res[] = $Bid->toArray();
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     $response = $res;
+    //     return $response; 
+    // }
 
 
 
@@ -70,7 +150,7 @@ class Bid extends Model
             $data->price = $posted_data['price'];
         }
         if (isset($posted_data['description'])) {
-            $data->description = $posted_data['description'];
+            $data->detail = $posted_data['description'];
         }
         $data->save();
         return $data;

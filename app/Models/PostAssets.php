@@ -30,11 +30,17 @@ class PostAssets extends Model
     {
         return $this->belongsTo(Post::class);
     }
+    public function filepond()
+    {
+        return $this->belongsTo(Filepond::class);
+    }
+     
 
     
     public function getPostAssets($posted_data = array()) {
         
         $query = PostAssets::latest();
+        $query = $query->with('post')->with('filepond');
 
         if(isset($posted_data) && count($posted_data)>0){
             if(isset($posted_data['id'])){
@@ -51,8 +57,8 @@ class PostAssets extends Model
             }
         }
         
-        $query->join('fileponds', 'fileponds.id', '=', 'post_assets.filepond_id');
-        $query->select('post_assets.*', 'fileponds.filename', 'fileponds.filepath');
+        // $query->join('fileponds', 'fileponds.id', '=', 'post_assets.filepond_id');
+        // $query->select('post_assets.*', 'fileponds.filename', 'fileponds.filepath');
         
         // $query->getQuery()->orders = null;
         // if(isset($posted_data['orderBy_name'])){
@@ -72,8 +78,80 @@ class PostAssets extends Model
             }
             // $result = $query->toSql();
         }
+        // $result = $query->toSql();
+        // echo '<pre>';
+        // print_r($result);
+        // exit;
+        // if(isset($posted_data['web_paginate'])){
+        //     $return_ary = array();
+        //     $return_ary['web_pagination'] = $result;
+        // }
+        // $newResult = PostAssets::associateRecords($result, $posted_data);
+        // // if($newResult){
+        //     if (!empty($result))
+        //         $result = $result->toArray();
+
+        //     if (isset($posted_data['paginate'])) {
+        //         $result['data'] = $newResult;
+        //     }else{
+        //         $result = $newResult;
+        //     }
+        // // }
+        // // echo '<pre>';
+        // // print_r($result);
+        // // exit;
+        // if(isset($posted_data['web_paginate'])){
+        //     $return_ary['records'] = $result;
+        //     return $return_ary;
+        // }
         return $result;
     }
+
+
+
+
+    
+    // public function associateRecords($result_ary, $posted_data)
+    // {
+    //     $res = array();
+    //     if($result_ary){
+    //         $result_ary = $result_ary->toArray();
+    //         if (isset($posted_data['paginate'])) {
+    //             $result_ary = $result_ary['data'];
+    //         }else if (isset($posted_data['detail'])) {
+    //             $conv_result_ary[] = $result_ary;
+    //             $result_ary = $conv_result_ary;
+    //         }
+                
+    //         if(isset($result_ary) && count($result_ary)>0){
+    //             foreach($result_ary as $record){
+    //                 $postAssets = PostAssets::find($record['id']);
+
+    //                 $filepond = Filepond::getRecord([
+    //                     'filepond_id' => $record['filepond_id'],
+    //                     'detail' => true,
+    //                 ]);
+    //                 // $postAssets['filepond'] = $filepond;
+                    
+    //                 $postAssets->filepond()->associate($filepond);
+                    
+                    
+    //                 if (isset($posted_data['detail'])) {
+    //                     $res = $postAssets->toArray();
+    //                 }else{
+    //                     $res[] = $postAssets->toArray();
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     $response = $res;
+    //     return $response; 
+    // }
+
+
+
+
+
 
     public function saveUpdatePostAssets($posted_data = array()) {
         if(isset($posted_data['update_id'])){

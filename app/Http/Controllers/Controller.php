@@ -18,6 +18,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\PostAssets;
 use App\Models\Filepond;
+use App\Models\Bid;
 
 use DB;
 use Validator;
@@ -39,6 +40,7 @@ class Controller extends BaseController
     public $UserObj;
     public $PostAssetsObj;
     public $FilepondObj;
+    public $BidObj;
 
     public function __construct() {
         
@@ -53,6 +55,7 @@ class Controller extends BaseController
         $this->UserObj = new User();
         $this->PostAssetsObj = new PostAssets();
         $this->FilepondObj = new Filepond();
+        $this->BidObj = new Bid();
     }
 
 

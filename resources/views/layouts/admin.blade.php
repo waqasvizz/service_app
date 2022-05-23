@@ -31,6 +31,10 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/themes/dark-layout.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/themes/bordered-layout.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/themes/semi-dark-layout.css') }}">
+    
+    <!-- BEGIN: Select2 CSS-->
+    <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/forms/select/select2.min.css') }}">
+    <!-- BEGIN: Select2 CSS-->
 
     <!-- BEGIN: Page CSS-->
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/core/menu/menu-types/vertical-menu.css') }}">
@@ -101,7 +105,8 @@
 
 
                 <li class="nav-item dropdown dropdown-user"><a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="javascript:void(0);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <div class="user-nav d-sm-flex d-none"><span class="user-name font-weight-bolder">{{ Auth::user()->name }}</span><span class="user-status">Admin</span></div><span class="avatar"><img class="round" src="{{ asset('app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="avatar" height="40" width="40"><span class="avatar-status-online"></span></span>
+                        <div class="user-nav d-sm-flex d-none"><span class="user-name font-weight-bolder">{{ Auth::user()->name }}</span><span class="user-status">Admin</span></div><span class="avatar"><img class="round" src="{{ is_image_exist(Auth::user()->profile_image) }}" alt="avatar" height="40" width="40"><span class="avatar-status-online"></span></span>
+                        {{-- <div class="user-nav d-sm-flex d-none"><span class="user-name font-weight-bolder">{{ Auth::user()->name }}</span><span class="user-status">Admin</span></div><span class="avatar"><img class="round" src="{{ asset('app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="avatar" height="40" width="40"><span class="avatar-status-online"></span></span> --}}
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown-user">
                         <a class="dropdown-item" href="{{ url('logout') }}"><i class="mr-50" data-feather="power"></i> Logout</a>
@@ -117,8 +122,11 @@
     <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
         <div class="navbar-header">
             <ul class="nav navbar-nav flex-row">
-                <li class="nav-item mr-auto"><a class="navbar-brand" href="../../../html/ltr/vertical-menu-template/index.html"><span class="brand-logo">
-                            <svg viewbox="0 0 139 95" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="24">
+                <li class="nav-item mr-auto">
+                    <a class="navbar-brand" href="../../../html/ltr/vertical-menu-template/index.html">
+                        <span class="brand-logo">
+                            <img src="{{ asset('storage/default-images/app-logo.png') }}" class="congratulations-img-left" alt="card-img-left"/>
+                            {{--<svg viewbox="0 0 139 95" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="24">
                                 <defs>
                                     <lineargradient id="linearGradient-1" x1="100%" y1="10.5120544%" x2="50%" y2="89.4879456%">
                                         <stop stop-color="#000000" offset="0%"></stop>
@@ -140,9 +148,11 @@
                                         </g>
                                     </g>
                                 </g>
-                            </svg></span>
+                            </svg>--}}
+                        </span>
                         <h2 class="brand-text">{{ config('app.name') }}</h2>
-                    </a></li>
+                    </a>
+                </li>
                 <li class="nav-item nav-toggle"><a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse"><i class="d-block d-xl-none text-primary toggle-icon font-medium-4" data-feather="x"></i><i class="d-none d-xl-block collapse-toggle-icon font-medium-4  text-primary" data-feather="disc" data-ticon="disc"></i></a></li>
             </ul>
         </div>
@@ -192,8 +202,16 @@
                     <ul class="menu-content">
                         <li class="{{ Request::path() == 'post' ? 'active' : '' }}"><a class="d-flex align-items-center" href="{{ url('post') }}"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="List">List</span></a>
                         </li>
-                        <li class="{{ Request::path() == 'post/create' ? 'active' : '' }}"><a class="d-flex align-items-center" href="{{ url('post/create') }}"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Add">Add</span></a>
+                        {{--<li class="{{ Request::path() == 'post/create' ? 'active' : '' }}"><a class="d-flex align-items-center" href="{{ url('post/create') }}"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Add">Add</span></a>
+                        </li>--}}
+                    </ul>
+                </li>
+                <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="copy"></i><span class="menu-title text-truncate" data-i18n="Bid">Bid</span></a>
+                    <ul class="menu-content">
+                        <li class="{{ Request::path() == 'bid' ? 'active' : '' }}"><a class="d-flex align-items-center" href="{{ url('bid') }}"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="List">List</span></a>
                         </li>
+                        {{--<li class="{{ Request::path() == 'bid/create' ? 'active' : '' }}"><a class="d-flex align-items-center" href="{{ url('bid/create') }}"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Add">Add</span></a>
+                        </li>--}}
                     </ul>
                 </li>
             </ul>
@@ -273,6 +291,11 @@
     <script src="{{ asset('app-assets/js/core/app-menu.js') }}"></script>
     <script src="{{ asset('app-assets/js/core/app.js') }}"></script>
     <!-- END: Theme JS-->
+
+    <!-- BEGIN: Page JS-->
+    <script src="{{ asset('app-assets/vendors/js/forms/select/select2.full.min.js') }}"></script>
+    <script src="{{ asset('app-assets/js/scripts/forms/form-select2.js') }}"></script>
+    <!-- END: Page JS-->
 
     <!-- BEGIN: Page JS-->
     {{-- <script src="{{ asset('app-assets/js/scripts/pages/dashboard-analytics.js') }}"></script> --}}
@@ -410,40 +433,11 @@
             // entry of subpremise information such as apartment, unit, or floor number.
             //   address2Field.focus();
         }
-    </script>
 
-    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-    <script>
         $(document).ready(function() {
-
-            $(".OnlyNumbers").keydown(function(event) {
-                if (!(event.keyCode == 8 // backspace
-                        ||
-                        event.keyCode == 9 // tab
-                        ||
-                        event.keyCode == 17 // ctrl
-                        ||
-                        event.keyCode == 46 // delete
-                        ||
-                        (event.keyCode >= 35 && event.keyCode <= 40) // arrow keys/home/end
-                        ||
-                        (event.keyCode >= 48 && event.keyCode <= 57) // numbers on keyboard
-                        ||
-                        (event.keyCode >= 96 && event.keyCode <= 105) // number on keypad
-                        ||
-                        (event.keyCode == 65 && prevKey == 17 && prevControl == event.currentTarget.id)) // ctrl + a, on same control
-                ) {
-                    event.preventDefault(); // Prevent character input
-                } else {
-                    prevKey = event.keyCode;
-                    prevControl = event.currentTarget.id;
-                }
-            });
-
             $('form.require-validation').bind('submit', function(e) {
-
                 var card_type = $('#payment_activity').val();
-
+                
                 // if (card_type == 'new_card') {
                 var $form = $(".require-validation"),
                     inputSelector = ['input[type=email]', 'input[type=password]', 'input[type=text]', 'input[type=file]', 'textarea'].join(', '),
@@ -476,18 +470,220 @@
                 //PaymentBillingWithOldCard();
                 // }
             });
-
+            
             $(window).on('load', function() {
-                if (feather) {
-                    feather.replace({
-                        width: 14,
-                        height: 14
-                    });
+            if (feather) {
+                feather.replace({
+                    width: 14,
+                    height: 14
+                });
+            }
+            });
+        });
+    </script>
+
+    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+    <script>
+        $(document).ready(function() {
+
+            setTimeout(function(){
+                $(".alert-success").remove();
+            }, 5000 ); // 5 secs
+                
+            var pathname = window.location.pathname;
+            if (pathname == '/bid') {
+                getAjaxData({
+                    'url': "{{ URL::to('get_services') }}",
+                    'method': 'GET',
+                    'module': 'services',
+                    'datatype': "html",
+                });
+            }
+
+            if (pathname == '/user') {
+                getAjaxData({
+                    'role': 3,
+                    'url': "{{ URL::to('get_users') }}",
+                    'method': 'POST',
+                    'module': 'users',
+                    'datatype': "html",
+                    'paginate': 10,
+                });
+            }
+                
+            $(".OnlyNumbers").keydown(function(event) {
+                if (!(event.keyCode == 8 // backspace
+                    ||
+                    event.keyCode == 9 // tab
+                    ||
+                    event.keyCode == 17 // ctrl
+                    ||
+                    event.keyCode == 46 // delete
+                    ||
+                    (event.keyCode >= 35 && event.keyCode <= 40) // arrow keys/home/end
+                    ||
+                    (event.keyCode >= 48 && event.keyCode <= 57) // numbers on keyboard
+                    ||
+                    (event.keyCode >= 96 && event.keyCode <= 105) // number on keypad
+                    ||
+                    (event.keyCode == 65 && prevKey == 17 && prevControl == event.currentTarget.id)) // ctrl + a, on same control
+                ) {
+                    event.preventDefault(); // Prevent character input
+                } else {
+                    prevKey = event.keyCode;
+                    prevControl = event.currentTarget.id;
                 }
             });
+                
+            $(document).on('change', '#select2-services', function(event) {
+                var service_id = $(this).val();
 
+                $('#select2-posts option[value="0"]').prop('selected', true);
+                $("#select2-posts").trigger('change.select2');
+                
+                getAjaxData({
+                    'service_id': service_id,
+                    'url': "{{ URL::to('get_posts') }}",
+                    'method': 'POST',
+                    'module': 'posts',
+                    'datatype': "json",
+                });
+
+                getAjaxData({
+                    'service_id': service_id,
+                    'url': "{{ URL::to('get_bids') }}",
+                    'method': 'POST',
+                    'module': 'bids',
+                    'datatype': "html",
+                    'paginate': 10,
+                });
+
+            });
+            
+            $(document).on('change', '#select2-posts', function(event) {
+                var post_id = $(this).val();
+                var service_id = $('#select2-services').val();
+                
+                getAjaxData({
+                    'post_id': post_id,
+                    'service_id': service_id,
+                    'url': "{{ URL::to('get_bids') }}",
+                    'method': 'POST',
+                    'module': 'bids',
+                    'datatype': "html",
+                    'paginate': 10,
+                });
+            });
+
+            $(document).on('change', '#select2-roles', function(event) {
+                var role_id = $(this).val();
+                var account_status = $('#select2-account-status').val();
+                
+                getAjaxData({
+                    'role': role_id,
+                    'active_status': account_status,
+                    'url': "{{ URL::to('get_users') }}",
+                    'method': 'POST',
+                    'module': 'users',
+                    'datatype': "html",
+                    'paginate': 10,
+                });
+            });
+
+            $(document).on('change', '#select2-account-status', function(event) {
+                var role_id = $('#select2-roles').val();
+                var account_status = $(this).val();
+                
+                getAjaxData({
+                    'role': role_id,
+                    'active_status': account_status,
+                    'url': "{{ URL::to('get_users') }}",
+                    'method': 'POST',
+                    'module': 'users',
+                    'datatype': "html",
+                    'paginate': 10,
+                });
+            });
+
+            $(document).on('click', '.bids_links .pagination a', function(event) {
+                event.preventDefault();
+
+                var page = $(this).attr('href').split('page=')[1];
+                var post_id = $('#select2-posts').val();
+                var service_id = $('#select2-services').val();
+                
+                getAjaxData({
+                    'post_id': post_id,
+                    'service_id': service_id,
+                    'url': "{{ URL::to('get_bids') }}",
+                    'method': 'POST',
+                    'module': 'bids',
+                    'datatype': "html",
+                    'paginate': 10,
+                    'page': page,
+                });
+            });
+
+            $(document).on('click', '.users_links .pagination a', function(event) {
+                event.preventDefault();
+
+                var page = $(this).attr('href').split('page=')[1];
+                var role_id = $('#select2-roles').val();
+                var account_status = $('#select2-account-status').val();
+                
+                getAjaxData({
+                    'role': role_id,
+                    'active_status': account_status,
+                    'url': "{{ URL::to('get_users') }}",
+                    'method': 'POST',
+                    'module': 'users',
+                    'datatype': "html",
+                    'paginate': 10,
+                    'page': page,
+                });
+            });
         });
 
+        function getAjaxData(data) {
+
+            // console.log(data);
+
+            // if ("service_id" in data && data["service_id"] !== null && data["service_id"] != '' && data["service_id"] != null)
+            //     var service_id = data["service_id"];
+
+            if (data["method"] == "POST") {
+                data["_token"] = "{{ csrf_token() }}";
+            }
+            
+            jQuery.ajax({
+                url: data['url'],
+                data: data,
+                method: data['method'],
+                dataType: data['datatype'],
+                success: function (response) {
+
+                    if (data['module'] == "posts") {
+                        $('#select2-posts').html('');
+                        $('#select2-posts').append('<option value="0"> ---- Choose Post ---- </option>');
+
+                        $.each(response['data'], function(index, val) {
+                            $('#select2-posts').append('<option value="'+this.id+'"> '+this.title+' </option>');
+                        });
+                    }
+                    else if (data['module'] == "bids") {
+                        $("#all_bids").empty().html(response);
+                    }
+                    else if (data['module'] == "services") {
+                        $("#all_services").empty().html(response);
+                        $("#select2-services").select2();
+                    }
+                    else if (data['module'] == "users") {
+                        $("#all_users").empty().html(response);
+                    }
+                }
+            });
+        }
+            
         function stripeResponseHandler(status, response) {
 
             var $form = $(".require-validation");

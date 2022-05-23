@@ -13,19 +13,14 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        // $categories = Category::all();
-        // $data = Category::Paginate(10);
+
         $posted_data = array();
         $posted_data['paginate'] = 10;
-        $data = $this->PostObj->getPost($posted_data);
+            // $posted_data['web_paginate'] = true;
 
-        // echo "Line no @"."<br>";
-        // echo "<pre>";
-        // print_r($data);
-        // echo "</pre>";
-        // exit("@@@@");
+        $data = $this->PostObj->getPost($posted_data);
 
         return view('post.list', compact('data'));
     }
@@ -59,11 +54,14 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        /*
         $rules = array(
-            'price' => 'required',
+            'task_completion_date' => 'required',
+            'pay_with' => 'required',
             'description' => 'required',
+            'price' => 'numeric|required',
             'title' => 'required',
+            'customer' => 'required',
+            'service' => 'required',
         );
 
         $validator = \Validator::make($request->all(), $rules);
@@ -71,57 +69,44 @@ class PostController extends Controller
         if ($validator->fails()) {            
             return redirect()->back()->withErrors($validator)->withInput();
         } else {
-            $posted_data = array();
-            $posted_data = $request->all();
+            $request_all = $request->all();
+            $post_id = $this->PostObj->saveUpdatePost($request_all);
 
-            $posted_data['description'] = $request->get('description');             
-
-            $latest_id = $this->EmailTemplateObj->saveUpdateEmailTemplate($posted_data);
-
-            \Session::flash('message', 'Successfully created email template!');
-            return redirect('/email_template');
-        }
-        */
-        $posted_data = $request->all();
-        $post_id = $this->PostObj->saveUpdatePost($posted_data);
-
-        if ($post_id) {
-
-            $posted_data = array();
-            $posted_data = $request->all();
-    
-            if ( isset($posted_data['images']) && count($posted_data['images']) > 0 ) {
-                foreach ($posted_data['images'] as $key => $value) {
-                    if(!empty($value)) {
-                        $filepond_id = Crypt::decrypt($value);
-                        if($filepond_id != 0 ) {
-                            $this->PostAssetsObj->saveUpdatePostAssets([
-                                'post_id' => $post_id,
-                                'filepond_id' => $filepond_id['id'],
-                                'asset_type' => 'image',
-                            ]);
+            if ($post_id) {
+        
+                if ( isset($request_all['images']) && count($request_all['images']) > 0 ) {
+                    foreach ($request_all['images'] as $key => $value) {
+                        if(!empty($value)) {
+                            $filepond_id = Crypt::decrypt($value);
+                            if($filepond_id != 0 ) {
+                                $this->PostAssetsObj->saveUpdatePostAssets([
+                                    'post_id' => $post_id,
+                                    'filepond_id' => $filepond_id['id'],
+                                    'asset_type' => 'image',
+                                ]);
+                            }
                         }
                     }
                 }
-            }
 
-            if ( isset($posted_data['videos']) && count($posted_data['videos']) > 0 ) {
-                foreach ($posted_data['videos'] as $key => $value) {
-                    if(!empty($value)) {
-                        $filepond_id = Crypt::decrypt($value);
-                        if($filepond_id != 0 ) {
-                            $this->PostAssetsObj->saveUpdatePostAssets([
-                                'post_id' => $post_id,
-                                'filepond_id' => $filepond_id['id'],
-                                'asset_type' => 'video',
-                            ]);
+                if ( isset($request_all['videos']) && count($request_all['videos']) > 0 ) {
+                    foreach ($request_all['videos'] as $key => $value) {
+                        if(!empty($value)) {
+                            $filepond_id = Crypt::decrypt($value);
+                            if($filepond_id != 0 ) {
+                                $this->PostAssetsObj->saveUpdatePostAssets([
+                                    'post_id' => $post_id,
+                                    'filepond_id' => $filepond_id['id'],
+                                    'asset_type' => 'video',
+                                ]);
+                            }
                         }
                     }
                 }
-            }
 
-            \Session::flash('message', 'Post is successfully created!');
-            return redirect('/post/create');
+                \Session::flash('message', 'Post is successfully created!');
+                return redirect('/post');
+            }
         }
 
         // $imagesInfo = Filepond::field($request->images);
@@ -134,14 +119,38 @@ class PostController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Update the specified resource in storage.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
+    public function ajax_get_posts(Request $request) {
+        
+        $posted_data = $request->all();
+
+        if ($request->ajax()) {
+            if ( isset($posted_data['method']) ) unset($posted_data['method']);
+            if ( isset($posted_data['url']) ) unset($posted_data['url']);
+                
+            if (!( isset($posted_data['service_id']) && $posted_data['service_id'] != '' && $posted_data['service_id'] != 0 ))
+                unset($posted_data['service_id']);
+        }
+        else {
+            // without ajax data here
+        }   
+        
+        $data = $this->PostObj->getPost($posted_data);
+
+        if ($request->ajax()) {
+            // if (!( isset($posted_data['module']) && $posted_data['module'] == 'bids' ))
+            //     return view('bid.ajax_records', compact('data'));
+            // else
+                return response()->json(['data' => $data]);
+        }
+        else {
+            return view('post.list', compact('data'));
+        }
     }
 
     /**
@@ -179,47 +188,59 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $posted_data = $request->all();
-        $posted_data['update_id'] = $id;
-        $post_id = $this->PostObj->saveUpdatePost($posted_data);
+        $rules = array(
+            'task_completion_date' => 'required',
+            'pay_with' => 'required',
+            'description' => 'required',
+            'price' => 'numeric|required',
+            'title' => 'required',
+            'customer' => 'required',
+            'service' => 'required',
+        );
 
-        if ($post_id) {
+        $validator = \Validator::make($request->all(), $rules);
 
-            $posted_data = array();
+        if ($validator->fails()) {            
+            return redirect()->back()->withErrors($validator)->withInput();
+        } else {
             $posted_data = $request->all();
-    
-            if ( isset($posted_data['images']) && count($posted_data['images']) > 0 ) {
-                foreach ($posted_data['images'] as $key => $value) {
-                    if(!empty($value)){
-                        $filepond_id = Crypt::decrypt($value);
-                        if($filepond_id != 0 ) {
-                            $this->PostAssetsObj->saveUpdatePostAssets([
-                                'post_id' => $post_id,
-                                'filepond_id' => $filepond_id['id'],
-                                'asset_type' => 'image',
-                            ]);
+            $posted_data['update_id'] = $id;
+            $post_id = $this->PostObj->saveUpdatePost($posted_data);
+
+            if ($post_id) {        
+                if ( isset($posted_data['images']) && count($posted_data['images']) > 0 ) {
+                    foreach ($posted_data['images'] as $key => $value) {
+                        if(!empty($value)){
+                            $filepond_id = Crypt::decrypt($value);
+                            if($filepond_id != 0 ) {
+                                $this->PostAssetsObj->saveUpdatePostAssets([
+                                    'post_id' => $post_id,
+                                    'filepond_id' => $filepond_id['id'],
+                                    'asset_type' => 'image',
+                                ]);
+                            }
                         }
                     }
                 }
-            }
 
-            if ( isset($posted_data['videos']) && count($posted_data['videos']) > 0 ) {
-                foreach ($posted_data['videos'] as $key => $value) {
-                    if(!empty($value)){
-                        $filepond_id = Crypt::decrypt($value);
-                        if($filepond_id != 0 ) {
-                            $this->PostAssetsObj->saveUpdatePostAssets([
-                                'post_id' => $post_id,
-                                'filepond_id' => $filepond_id['id'],
-                                'asset_type' => 'video',
-                            ]);
+                if ( isset($posted_data['videos']) && count($posted_data['videos']) > 0 ) {
+                    foreach ($posted_data['videos'] as $key => $value) {
+                        if(!empty($value)){
+                            $filepond_id = Crypt::decrypt($value);
+                            if($filepond_id != 0 ) {
+                                $this->PostAssetsObj->saveUpdatePostAssets([
+                                    'post_id' => $post_id,
+                                    'filepond_id' => $filepond_id['id'],
+                                    'asset_type' => 'video',
+                                ]);
+                            }
                         }
                     }
                 }
-            }
 
-            \Session::flash('message', 'Post is updated successfully!');
-            return redirect('/post');
+                \Session::flash('message', 'Post is updated successfully!');
+                return redirect('/post');
+            }
         }
     }
 

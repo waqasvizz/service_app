@@ -29,7 +29,12 @@ class Service extends Model
             $query = $query->where('services.service_name', 'like', '%' . $posted_data['service_name'] . '%');
         }
 
-        $query->select('services.*');
+        if(isset($posted_data['columns'])){
+            $query->select($posted_data['columns']);
+        }
+        else {
+            $query->select('services.*');
+        }
         
         $query->getQuery()->orders = null;
         if (isset($posted_data['orderBy_name'])) {

@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\BaseController as BaseController;
+use RahulHaque\Filepond\Models\Filepond;
+use App\Models\Filepond as Filepond_Model;
 use Validator;
 use App\Models\Post;
 use App\Models\PostAssets;
-use App\Models\Filepond as Filepond_Model;
-use RahulHaque\Filepond\Models\Filepond;
+use App\Models\User;
+use App\Models\Notification;
+use App\Models\FCM_Token;
 
 class PostController extends BaseController
 {
@@ -29,60 +32,71 @@ class PostController extends BaseController
 
         if (isset($params['post_id']))
             $posted_data['id'] = $params['post_id'];
+        if (isset($params['service_id']))
+            $posted_data['service_id'] = $params['service_id'];
+        if (isset($params['customer_id']))
+            $posted_data['customer_id'] = $params['customer_id'];
+        if (isset($params['provider_id']))
+            $posted_data['provider_id'] = $params['provider_id'];
         if (isset($params['post_title']))
             $posted_data['title'] = $params['post_title'];
         if (isset($params['per_page']))
             $posted_data['paginate'] = $params['per_page'];
         
-        $posts = Post::getPost($posted_data)->ToArray();
-        // $posts = Post::getPost($posted_data);
-
-        if (count($posts) > 0) {
-            foreach ($posts['data'] as $key => $item) {
-                // foreach ($posts as $key => $item) {
-                $posts['data'][$key]['images'] = PostAssets::getPostAssets(['post_id' => $item['id'], 'asset_type' => 'image'])->ToArray();
-                $posts['data'][$key]['videos'] = PostAssets::getPostAssets(['post_id' => $item['id'], 'asset_type' => 'video'])->ToArray();
-
-                // echo '<pre>';
-                // print_r($item->PostAssets);
-                // exit;
-                // $post = Post::find($item->id);
-                // $posts[$key]['images'] = $post->PostAssets;
-                
-                // $posts[$key]['images'] = PostAssets::whereHas('post', function($q) {
-                //     $q->where('asset_type', 'image');
-                // })->where('post_id', $item->id)->get();
-                
-                // $posts[$key]['video'] = PostAssets::whereHas('post', function($q) {
-                //     $q->where('asset_type', 'video');
-                // })->where('post_id', $item->id)->get();
-
-                // echo '<pre>';
-                // print_r($posts[$key]['service_id']);
-                // exit;
-        
-                // $posts['data'][$key]['images'] = Post::PostAssets();
-
-                // $assets_array = [];
-                // foreach ($posts_assets as $posts_key => $posts_item) {
-                //     if (isset($posts_item['asset_type'])) {
-                //         $assets_array['asset_id'] = $posts_item['id'];
-                //         $assets_array['asset_type'] = $posts_item['asset_type'];
-                //         $assets_array['filename'] = $posts_item['filename'];
-                //         $assets_array['filepath'] = $posts_item['filepath'];
-                //     }
-
-                //     if ($posts_item['asset_type'] == 'image')
-                //         $posts['data'][$key]['images'][] = $assets_array;
-                //     else if ($posts_item['asset_type'] == 'video')
-                //         $posts['data'][$key]['videos'][] = $assets_array;
-                // }
-            }
-        }
-
+        // $posts = Post::getPost($posted_data)->ToArray();
+        $posts = Post::getPost($posted_data);
         $message = count($posts) > 0 ? 'Posts retrieved successfully.' : 'Posts not found against your query.';
-
         return $this->sendResponse($posts, $message);
+
+        
+        // // $posts = Post::getPost($posted_data);
+
+        // if (count($posts) > 0) {
+        //     foreach ($posts['data'] as $key => $item) {
+        //         // foreach ($posts as $key => $item) {
+        //         $posts['data'][$key]['images'] = PostAssets::getPostAssets(['post_id' => $item['id'], 'asset_type' => 'image'])->ToArray();
+        //         $posts['data'][$key]['videos'] = PostAssets::getPostAssets(['post_id' => $item['id'], 'asset_type' => 'video'])->ToArray();
+
+        //         // echo '<pre>';
+        //         // print_r($item->PostAssets);
+        //         // exit;
+        //         // $post = Post::find($item->id);
+        //         // $posts[$key]['images'] = $post->PostAssets;
+                
+        //         // $posts[$key]['images'] = PostAssets::whereHas('post', function($q) {
+        //         //     $q->where('asset_type', 'image');
+        //         // })->where('post_id', $item->id)->get();
+                
+        //         // $posts[$key]['video'] = PostAssets::whereHas('post', function($q) {
+        //         //     $q->where('asset_type', 'video');
+        //         // })->where('post_id', $item->id)->get();
+
+        //         // echo '<pre>';
+        //         // print_r($posts[$key]['service_id']);
+        //         // exit;
+        
+        //         // $posts['data'][$key]['images'] = Post::PostAssets();
+
+        //         // $assets_array = [];
+        //         // foreach ($posts_assets as $posts_key => $posts_item) {
+        //         //     if (isset($posts_item['asset_type'])) {
+        //         //         $assets_array['asset_id'] = $posts_item['id'];
+        //         //         $assets_array['asset_type'] = $posts_item['asset_type'];
+        //         //         $assets_array['filename'] = $posts_item['filename'];
+        //         //         $assets_array['filepath'] = $posts_item['filepath'];
+        //         //     }
+
+        //         //     if ($posts_item['asset_type'] == 'image')
+        //         //         $posts['data'][$key]['images'][] = $assets_array;
+        //         //     else if ($posts_item['asset_type'] == 'video')
+        //         //         $posts['data'][$key]['videos'][] = $assets_array;
+        //         // }
+        //     }
+        // }
+
+        // $message = count($posts) > 0 ? 'Posts retrieved successfully.' : 'Posts not found against your query.';
+
+        // return $this->sendResponse($posts, $message);
     }
 
     /**
@@ -113,19 +127,24 @@ class PostController extends BaseController
             'price' => 'required',
             'title' => 'required',
             'description' => 'required',
-            'pay_with' => 'required',
+            // 'pay_with' => 'required',
+            'task_completion_date' => 'required',
             // 'post_images' => 'required',
             // 'post_videos' => 'required',
+            'lat' => 'required',
+            'long' => 'required',
+            'address' => 'required',
         ]);
    
         if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
+            return $this->sendError('Please fill all the required fields.', ["error"=>$validator->errors()->first()]);
         }
 
-        $post_id = $this->PostObj->saveUpdatePost($posted_data);
+        $post = $this->PostObj->saveUpdatePost($posted_data);
         
-        $message = ($post_id) > 0 ? 'Post is successfully added.' : 'Something went wrong during post adding.';
-        if ($post_id) {
+        $message = ($post->id) > 0 ? 'Post is successfully added.' : 'Something went wrong during post adding.';
+        $error_message['error'] = ($post->id) > 0 ? 'Post is successfully added.' : 'Something went wrong during post adding.';
+        if ($post->id) {
 
             if (isset($request->post_images)) {
                 $allowedfileExtension = ['jpeg','jpg','png'];
@@ -199,7 +218,7 @@ class PostController extends BaseController
             
             foreach ($images_arr as $key => $item) {
                 PostAssets::saveUpdatePostAssets([
-                    'post_id' => $post_id,
+                    'post_id' => $post->id,
                     'filepond_id' => $item['asset_id'],
                     'asset_type' => 'image',
                 ]);
@@ -207,15 +226,66 @@ class PostController extends BaseController
 
             foreach ($videos_arr as $key => $item) {
                 PostAssets::saveUpdatePostAssets([
-                    'post_id' => $post_id,
+                    'post_id' => $post->id,
                     'filepond_id' => $item['asset_id'],
                     'asset_type' => 'video',
                 ]);
             }
+
+            $data = array();
+            $data['detail'] = true;
+            $data['id'] = $post->id;
+            $post_data = Post::getPost($data);
+            $model_response = $post_data->toArray();
+            
+            $data = array();
+            $data['role'] = 2;
+            $user_data = User::getUser($data)->ToArray();
+
+            $notification_text = "A new job is posted nearby your location.";
+
+            foreach ($user_data as $key => $value) {
+
+                $receiver_id = $value['id'];
+                $service_id = $posted_data['service_id'];
+
+                $notification_params = array();
+                $notification_params['sender'] = $posted_data['customer_id'];
+                $notification_params['receiver'] = $value['id'];
+                $notification_params['slugs'] = "new-post";
+                $notification_params['notification_text'] = $notification_text;
+                $notification_params['seen_by'] = "";
+                $notification_params['metadata'] = "post_id=$post->id"."&service_id=$service_id";
+               
+                $response = Notification::saveUpdateNotification([
+                    'sender' => $notification_params['sender'],
+                    'receiver' => $notification_params['receiver'],
+                    'slugs' => $notification_params['slugs'],
+                    'notification_text' => $notification_params['notification_text'],
+                    'seen_by' => $notification_params['seen_by'],
+                    'metadata' => $notification_params['metadata']
+                ]);
+                
+                $tokens[] = array_column($value['fcm_tokens'], 'device_token');
+            }
+
+            $registration_ids = array_flatten($tokens);
+            
+            $notification = false;
+            if ($response) {
+                $notification = FCM_Token::sendFCM_Notification([
+                    'title' => $notification_params['slugs'],
+                    'body' => $notification_params['notification_text'],
+                    'metadata' => $notification_params['metadata'],
+                    'registration_ids' => $registration_ids,
+                    'details' => $model_response
+                ]);
+            }
+
             return $this->sendResponse([], $message);
         }
         else
-            return $this->sendError($message);
+            return $this->sendError($error_message['error'], $error_message);
     }
 
     /**
@@ -266,7 +336,12 @@ class PostController extends BaseController
             ]);
        
             if($validator->fails()){
-                return $this->sendError('Validation Error.', $validator->errors());
+                return $this->sendError('Please fill all the required fields.', ["error"=>$validator->errors()->first()]);
+            }
+
+            if($id == 0){
+                $error_message['error'] = 'This post is not found.';
+                return $this->sendError($error_message['error'], $error_message);
             }
 
             $post_data = array();
@@ -274,7 +349,8 @@ class PostController extends BaseController
             $post_data['id'] = $id;
             $post_record = Post::getPost($post_data);
             if(!$post_record){
-                return $this->sendError('This Post cannot found');
+                $error_message['error'] = 'This post is not found.';
+                return $this->sendError($error_message['error'], $error_message);
             }
             
             if (isset($request->post_images)) {
@@ -351,7 +427,7 @@ class PostController extends BaseController
 
             foreach ($images_arr as $key => $item) {
                 PostAssets::saveUpdatePostAssets([
-                    'post_id' => $post_record->id,
+                    'post_id' => $post_record['id'],
                     'filepond_id' => $item['asset_id'],
                     'asset_type' => 'image',
                 ]);
@@ -359,20 +435,21 @@ class PostController extends BaseController
 
             foreach ($videos_arr as $key => $item) {
                 PostAssets::saveUpdatePostAssets([
-                    'post_id' => $post_record->id,
+                    'post_id' => $post_record['id'],
                     'filepond_id' => $item['asset_id'],
                     'asset_type' => 'video',
                 ]);
             }
 
-            $posted_data['update_id'] = $post_record->id;
+            $posted_data['update_id'] = $post_record['id'];
             $post = Post::saveUpdatePost($posted_data);
 
             $message = ($post) ? 'Post is successfully updated.' : 'Something went wrong during post update.';
             return $this->sendResponse([], $message);
         }
         else {
-            return $this->sendError('You have entered a wrong post id.');
+            $error_message['error'] = 'The post is not found.';
+            return $this->sendError($error_message['error'], $error_message);
         }
     }
 
@@ -391,14 +468,16 @@ class PostController extends BaseController
             $data = PostAssets::getPostAssets($posted_data);
 
             foreach ($data as $key => $value) {
-                delete_files_from_storage($value->filepath);
-                Filepond_Model::deleteRecord($value->filepond_id);
+                delete_files_from_storage($value['filepond']['filepath']);
+                Filepond_Model::deleteRecord($value['filepond']['id']);
             }
             
             Post::deletePost($id);
             return $this->sendResponse([], 'Post is deleted successfully.');
         }
-        else 
-            return $this->sendError('Post is not found OR already deleted.');
+        else {
+            $error_message['error'] = 'The post is not found OR already deleted.';
+            return $this->sendError($error_message['error'], $error_message);
+        }
     }
 }

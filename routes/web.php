@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use RahulHaque\Filepond\Http\Controllers\FilepondController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MosqueController;
 use App\Http\Controllers\ServiceController;
@@ -9,10 +10,10 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PostAssetsController;
 use App\Http\Controllers\PostController;
-use RahulHaque\Filepond\Http\Controllers\FilepondController;
+use App\Http\Controllers\BidController;
 
 
-
+//test
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -65,12 +66,18 @@ Route::get('/queue-work', function() {
 });
     
 Route::get('/migration-refresh', function() {
-    // Artisan::call("migrate:fresh");
-    Artisan::call('migrate:refresh');    
-    // Artisan::call('passport:install --force');    
-    Artisan::call('passport:install');
-
+    Artisan::call('migrate:refresh');
     return '<h1>Migration refresh successfully</h1>';
+});
+    
+Route::get('/migration-fresh', function() {
+    Artisan::call("migrate:fresh");
+    return '<h1>Migration fresh successfully</h1>';
+});
+    
+Route::get('/passport-install', function() {   
+    Artisan::call('passport:install');
+    return '<h1>Passport install successfully</h1>';
 });
 
 // Route::get('/', function () {
@@ -103,15 +110,25 @@ Route::post('/payment', [PaymentController::class, 'payment'])->name('payment');
 Route::get('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('success.pay');
 
 Route::middleware(['auth'])->group(function () {
+    
+    Route::post('/update_user', [UserController::class, 'update_records']);
+    
+    Route::post('/get_posts', [PostController::class, 'ajax_get_posts']);
+    Route::post('/get_bids', [BidController::class, 'ajax_get_bids']);
+    Route::post('/get_users', [UserController::class, 'ajax_get_users']);
+
+    Route::get('/get_services', [ServiceController::class, 'ajax_get_services']);
 
     Route::get('/filepond_record_get', [FilepondController::class, 'get_records']);
     Route::get('/filepond_record_destroy', [FilepondController::class, 'destroy_records']);
-    
     Route::get('/admin', [UserController::class, 'dashboard']);
+
+    //resouce routes
     Route::resource('service', ServiceController::class);
     Route::resource('category', CategoryController::class);
     Route::resource('role', RoleController::class);
     Route::resource('user', UserController::class);
     Route::resource('post', PostController::class);
     Route::resource('post_asset', PostAssetsController::class);
+    Route::resource('bid', BidController::class);
 });

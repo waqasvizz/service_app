@@ -8,6 +8,7 @@
 
 
 <form class="auth-login-form mt-2" action="{{ route('accountLogin') }}" method="POST">
+    @method('POST')
     @csrf
     <div class="form-group">
         <label for="email" class="form-label">Email</label>

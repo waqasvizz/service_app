@@ -15,33 +15,12 @@ class CreatePaymentsTable extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-
             $table->bigInteger('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->string('amount_captured');
             $table->string('currency');
-            $table->longText('response_object');
-            $table->string('payment_method');
-            $table->string('payment_intent');
-            $table->string('payment_status');
-
-            $table->string('stripe_prod_id')->nullable();
-            $table->string('stripe_plan_id')->nullable();
-            $table->string('stripe_sub_id')->nullable();
-            $table->string('subscription_status')->nullable();
-            $table->string('stripe_sub_cycle')->default(0);
-            $table->string('stripe_customer_id')->nullable();
-            $table->longText('stripe_response_card_info')->nullable();
-            
-            $table->string('paypal_payment_id')->nullable();
-            $table->string('paypal_transaction_id')->nullable();
-            $table->string('paypal_payer_id')->nullable();
-            $table->string('paypal_merchant_id')->nullable();
-            
-            $table->string('coupon_code_id')->nullable();
-            $table->string('coupon_discount')->nullable();
-            $table->float('coupon_amount')->nullable();
-
+            $table->longText('response_object')->default(NULL)->nullable();
+            $table->string('payment_expiry', 100)->default(NULL)->nullable();
             $table->timestamps();
         });
     }

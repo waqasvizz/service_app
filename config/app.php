@@ -59,9 +59,15 @@ return [
     // 'asset_url' => env('ASSET_URL', null),
 
 
-    'url' => env('APP_ENV')=='local'? 'http://localhost:8000':'https://example.com/public/',
-    
-    'asset_url' => env('APP_ENV')=='local'? '':'https://example.com.com/public/',
+
+    // 'url' => env('APP_URL', 'http://localhost:8000'),
+
+    // 'asset_url' => env('ASSET_URL', null),
+
+
+    'url' => env('APP_ENV') == 'local' ? 'http://localhost:8000' : 'http://3bidsapp.com/public/',
+
+    'asset_url' => env('APP_ENV') == 'local' ? '' : 'http://3bidsapp.com/public/',
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -236,7 +242,6 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
+        'Constants' => App\Constants\Constants::class
     ],
-
 ];

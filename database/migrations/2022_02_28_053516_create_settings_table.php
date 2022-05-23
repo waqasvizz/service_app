@@ -15,7 +15,11 @@ class CreateSettingsTable extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
-
+            // $table->text('meta_key')->nullable();
+            // $table->text('meta_value')->nullable();
+            
+            // ----------------------------------------------------
+            // ----------------------------------------------------
             $table->text('stripe_mode')->comment('test/live');
             $table->text('stpk')->comment('Publishable Test Key');
             $table->text('stsk')->comment('Secret Test Key');

@@ -58,9 +58,8 @@ class ServiceController extends BaseController
         ]);
    
         if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Pleaee fill all the required fields.', ["error"=>$validator->errors()->first()]);
         }
-
 
         $base_url = public_path();
         if($request->file('service_image')) {
@@ -69,13 +68,15 @@ class ServiceController extends BaseController
 
                 $file_name = time().'_'.$request->service_image->getClientOriginalName();
                 $filePath = $request->file('service_image')->storeAs('service_image', $file_name, 'public');
-                $request_data['service_image'] = 'storage/service_image/'.$file_name;
+                $request_data['service_image'] = 'service_image/'.$file_name;
             
             }else{
-                return $this->sendError('Service image format is not correct ( jpg | jpeg | png )!');
+                $error_message['error'] = 'The service image format is not correct ( jpg | jpeg | png )!';
+                return $this->sendError($error_message['error'], $error_message);
             }
         }else{
-            return $this->sendError('Please upload service image');
+            $error_message['error'] = 'Please upload the service image.';
+            return $this->sendError($error_message['error'], $error_message);
         }
          
         $service = Service::saveUpdateService($request_data);   
@@ -96,7 +97,8 @@ class ServiceController extends BaseController
         $service = Service::find($id);
   
         if (is_null($service)) {
-            return $this->sendError('Service not found.');
+            $error_message['error'] = 'The service is not found.';
+            return $this->sendError($error_message['error'], $error_message);
         }
    
         return $this->sendResponse($service, 'Service retrieved successfully.');
@@ -120,7 +122,7 @@ class ServiceController extends BaseController
         ]);
    
         if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Please fill all the required fields.', ["error"=>$validator->errors()->first()]);
         }
 
         $posted_data = array();
@@ -128,7 +130,8 @@ class ServiceController extends BaseController
         $posted_data['id'] = $id;
         $service = Service::getServices($posted_data);
         if(!$service){
-            return $this->sendError('This Service cannot found');
+            $error_message['error'] = 'This service is not found';
+            return $this->sendError($error_message['error'], $error_message);
         }
    
         // $service->name = $request_data['name'];
@@ -150,9 +153,10 @@ class ServiceController extends BaseController
                 
                 $file_name = time().'_'.$request->service_image->getClientOriginalName();
                 $filePath = $request->file('service_image')->storeAs('service_image', $file_name, 'public');
-                $request_data['service_image'] = 'storage/service_image/'.$file_name;
+                $request_data['service_image'] = 'service_image/'.$file_name;
             }else{
-                return $this->sendError('Service image format is not correct ( jpg | jpeg | png )!');
+                $error_message['error'] = 'Service image format is not correct ( jpg | jpeg | png )!';
+                return $this->sendError($error_message['error'], $error_message);
             }
         }
         $request_data['update_id'] = $id;
@@ -182,7 +186,8 @@ class ServiceController extends BaseController
             Service::deleteService($id); 
             return $this->sendResponse([], 'Service deleted successfully.');
         }else{
-            return $this->sendError('Service already deleted.');
+            $error_message['error'] = 'The service is already deleted.';
+            return $this->sendError($error_message['error'], $error_message);
         } 
     }
 }

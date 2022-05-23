@@ -20,6 +20,7 @@ class CreateBidsTabel extends Migration
             $table->unsignedBigInteger('post_id');
             $table->foreign('post_id')->references('id')->on('posts')->onUpdate('cascade')->onDelete('cascade');
             $table->integer('price');
+            $table->tinyInteger('status')->default(1)->comment('1=Pending, 2=Reject, 3=Accept');
             $table->longText('detail')->nullable();
             $table->timestamps();
         });

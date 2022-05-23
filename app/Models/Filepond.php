@@ -29,6 +29,10 @@ class Filepond extends Model
                 $result = $query->get();
             }
         }
+        // $result = $query->toSql();
+        // echo '<pre>';
+        // print_r($result);
+        // exit;
         return $result;
     }
     

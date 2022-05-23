@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Api\BaseController as BaseController;
 use Validator;
 use App\Models\Bid;
+use App\Models\Notification;
+use App\Models\FCM_Token;
 
 class BidController extends BaseController
 {
@@ -43,11 +45,57 @@ class BidController extends BaseController
         ]);
    
         if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Please fill all the required fields.', ["error"=>$validator->errors()->first()]);       
         }
         
         $bid = Bid::saveUpdateBid($request_data);
-   
+
+        $get_data = array();
+        $get_data['detail'] = true;
+        $get_data['bid_id'] = $bid['id'];
+        $bid_data = Bid::getBids($get_data);
+        $model_response = $bid_data->toArray();
+
+        $post_id = $request_data['post_id'];
+        $bid_id = $bid['id'];
+        $notification_text = "A new bid is posted on you job.";
+
+        $notification_params = array();
+        $notification_params['sender'] = auth()->user()->id;
+        $notification_params['receiver'] = $model_response['post']['customer']['id'];
+        $notification_params['slugs'] = "new-bid";
+        $notification_params['notification_text'] = $notification_text;
+        $notification_params['seen_by'] = "";
+        $notification_params['metadata'] = "post_id=$post_id&"."bid_id=$bid_id";
+        
+        $response = Notification::saveUpdateNotification([
+            'sender' => $notification_params['sender'],
+            'receiver' => $notification_params['receiver'],
+            'slugs' => $notification_params['slugs'],
+            'notification_text' => $notification_params['notification_text'],
+            'seen_by' => $notification_params['seen_by'],
+            'metadata' => $notification_params['metadata']
+        ]);
+
+        $firebase_devices = FCM_Token::getFCM_Tokens(['user_id' => $notification_params['receiver']])->toArray();
+        $notification_params['registration_ids'] = array_column($firebase_devices, 'device_token');
+
+        if ($response) {
+
+            if ( isset($model_response['user']) )
+                unset($model_response['user']);
+            if ( isset($model_response['post']) )
+                unset($model_response['post']);
+
+            $notification = FCM_Token::sendFCM_Notification([
+                'title' => $notification_params['slugs'],
+                'body' => $notification_params['notification_text'],
+                'metadata' => $notification_params['metadata'],
+                'registration_ids' => $notification_params['registration_ids'],
+                'details' => $model_response
+            ]);
+        }
+        
         return $this->sendResponse($bid, 'Bid created successfully.');
     } 
    
@@ -62,7 +110,8 @@ class BidController extends BaseController
         $bid = Bid::find($id);
   
         if (is_null($bid)) {
-            return $this->sendError('Bid not found.');
+            $error_message['error'] = 'The bid is not found.';
+            return $this->sendError($error_message['error'], $error_message);
         }
    
         return $this->sendResponse($bid, 'Bid retrieved successfully.');
@@ -86,7 +135,7 @@ class BidController extends BaseController
         ]);
    
         if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Please fill all the required fields.', ["error"=>$validator->errors()->first()]);
         }
 
         $posted_data = array();
@@ -94,7 +143,8 @@ class BidController extends BaseController
         $posted_data['id'] = $id;
         $bid = Bid::getBids($posted_data);
         if(!$bid){
-            return $this->sendError('This Bid cannot found');
+            $error_message['error'] = 'The bid is not found.';
+            return $this->sendError($error_message['error'], $error_message);
         }
         
         $request_data['update_id'] = $id;
@@ -116,8 +166,8 @@ class BidController extends BaseController
             Bid::deleteBid($id); 
             return $this->sendResponse([], 'Bid deleted successfully.');
         }else{
-            return $this->sendError('Bid does not found.');
-            // return $this->sendError('Bid already deleted.');
+            $error_message['error'] = 'The bid is not found.';
+            return $this->sendError($error_message['error'], $error_message);
         } 
     }
 }

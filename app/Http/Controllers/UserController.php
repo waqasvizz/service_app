@@ -7,15 +7,41 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Models\AssignService;
 use App\Models\User;
+use App\Models\FCM_Token;
 use App\Models\Role;
 use App\Models\Service;
+use App\Models\Setting;
 use Validator;
 use Session;
 use DB;
 use Auth;
+use Illuminate\Support\Facades\Crypt;
+use Laravel\Passport\Token;
 
 class UserController extends Controller
 {
+    
+    public function testing() {
+        
+        $user_id = 23;
+        $token_data = FCM_Token::where('user_id', '=', $user_id)->get();
+        $token_exist = false;
+
+        if (count($token_data) > 0)
+        {
+            foreach ($token_data as $key => $value) {
+                $token_data[$key]->delete();
+            }
+
+            Token::where('user_id', $user_id)
+                ->update(['revoked' => true]);
+        }
+
+        // $request->user()->token()->revoke();
+        // $message = ($token_data) ? 'User successfully logout and device token also revoked.' : 'User successfully logged out but device token not found.';
+        
+    }
+    
     public function welcome()
     {
         return view('auth_v1.login');
@@ -49,7 +75,13 @@ class UserController extends Controller
 
     public function dashboard()
     {
-        return view('dashboard');
+        $posted_data = array();
+        $posted_data['count'] = true;
+        $data['users_count'] = $this->UserObj->getUser($posted_data);
+        $data['posts_count'] = $this->PostObj->getPost($posted_data);
+        $data['bids_count'] = $this->BidObj->getBids($posted_data);
+        
+        return view('dashboard', compact('data'));
     }
     /**
      * Display a listing of the resource.
@@ -58,12 +90,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        $posted_data = array();
-        $posted_data['paginate'] = 10;
-        // $posted_data['latitude'] = '33.548087';
-        // $posted_data['longitude'] = '73.130306';
-        $data = User::getUser($posted_data);
-    
+        $data = array();
+        $data['roles'] = Role::getRoles();
+        
+        // $posted_data = array();
+        // $posted_data['paginate'] = 10;
+        // $data['users'] = User::getUser($posted_data);
+
         return view('user.list', compact('data'));
     }
 
@@ -165,7 +198,7 @@ class UserController extends Controller
                         
                         $file_name = time().'_'.$request->profile_image->getClientOriginalName();
                         $filePath = $request->file('profile_image')->storeAs('profile_image', $file_name, 'public');
-                        $posted_data['profile_image'] = 'storage/profile_image/'.$file_name;
+                        $posted_data['profile_image'] = 'profile_image/'.$file_name;
                     }else{
                         return back()->withErrors([
                             'profile_image' => 'The Profile image format is not correct you can only upload (jpg, jpeg, png).',
@@ -205,9 +238,42 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
+    public function ajax_get_users(Request $request) {
+
+        $posted_data = $request->all();
+
+        if ($request->ajax()) {
+
+            if ( isset($posted_data['method']) ) unset($posted_data['method']);
+            if ( isset($posted_data['url']) ) unset($posted_data['url']);
+                
+            if (!( isset($posted_data['role']) && $posted_data['role'] != '' && $posted_data['role'] != 0 ))
+                unset($posted_data['role']);
+            if (!( isset($posted_data['active_status']) && $posted_data['active_status'] != '' && $posted_data['active_status'] != '0' ))
+                unset($posted_data['active_status']);
+        }
+        else {
+            // without ajax data here
+        }
+
+        $data['users'] = $this->UserObj->getUser($posted_data);
+
+        if (isset($posted_data['role']) && $posted_data['role'] == 1 )
+            $data['users_mode'] = 'Admin';
+        else if (isset($posted_data['role']) && $posted_data['role'] == 2 )
+            $data['users_mode'] = 'Contractor';
+        else if (isset($posted_data['role']) && $posted_data['role'] == 3 )
+            $data['users_mode'] = 'Customer';
+
+        if ($request->ajax()) {
+            // if (!( isset($posted_data['module']) && $posted_data['module'] == 'bids' ))
+                return view('user.ajax_records', compact('data'));
+            // else
+                // return response()->json(['data' => $data]);
+        }
+        else {
+            return view('post.list', compact('data'));
+        }
     }
 
     /**
@@ -407,7 +473,7 @@ class UserController extends Controller
                         
                         $file_name = time().'_'.$request->profile_image->getClientOriginalName();
                         $filePath = $request->file('profile_image')->storeAs('profile_image', $file_name, 'public');
-                        $posted_data['profile_image'] = 'storage/profile_image/'.$file_name;
+                        $posted_data['profile_image'] = 'profile_image/'.$file_name;
                     }else{
                         return back()->withErrors([
                             'profile_image' => 'The Profile image format is not correct you can only upload (jpg, jpeg, png).',
@@ -425,6 +491,45 @@ class UserController extends Controller
             }
             return redirect()->back()->withInput();
         }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update_records(Request $request) {
+        
+        $posted_data = $request->all();
+
+        $user_data = array();
+
+        if ( isset($posted_data['update_id']) )
+            $user_data['update_id'] = $posted_data['update_id'];
+        if ( isset($posted_data['active_status']) )
+            $user_data['active_status'] = $posted_data['active_status'];
+
+        $response = User::saveUpdateUser($user_data);
+
+        if ($response->id) {
+            $user_id = isset($user_data['update_id']) ? $user_data['update_id'] : 0;
+            $token_data = FCM_Token::where('user_id', '=', $user_id)->get();
+    
+            if (count($token_data) > 0)
+            {
+                foreach ($token_data as $key => $value) {
+                    $token_data[$key]->delete();
+                }
+    
+                Token::where('user_id', $user_id)
+                    ->update(['revoked' => true]);
+            }
+        }
+
+        Session::flash('message', 'User Updated Successfully!');
+        return redirect()->back();
     }
 
     /**
@@ -459,27 +564,6 @@ class UserController extends Controller
         //     Session::flash('error_message', 'Service already deleted!');
         // }
         // return redirect()->back();
-    }
-    
-    public function testing() {
-
-        $base_url = public_path();
-        echo $base_url.'<br><br>';
-
-        echo $_SERVER['DOCUMENT_ROOT'];
-
-        exit('deedeeee');
-        // $posted_data['id'] = Auth::user()->id;
-        // $posted_data['detail'] = true;
-
-        // $result = User::getUser($posted_data);
-
-        echo "Line no @"."<br>";
-        echo "<pre>";
-        print_r($result);
-        echo "</pre>";
-        exit("@@@@");
-
     }
 
     public function accountLogin(Request $request)

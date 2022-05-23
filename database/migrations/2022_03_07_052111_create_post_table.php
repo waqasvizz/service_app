@@ -19,11 +19,15 @@ class CreatePostTable extends Migration
             $table->foreign('service_id')->references('id')->on('services')->onUpdate('cascade')->onDelete('cascade');
             $table->unsignedBigInteger('customer_id');
             $table->foreign('customer_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->float('price');
+            $table->integer('price');
             $table->string('title', 100);
-            $table->string('description', 150);
-            $table->tinyInteger('pay_with')->default('0')->comment('1=COD, 2=Paypal, 3=Stripe');
-            $table->string('status')->default('0')->comment('1=Pending, 2=In-Progress, 3=Complete');
+            $table->string('lat', 100)->nullable();
+            $table->string('long', 100)->nullable();
+            $table->string('address', 100)->nullable();
+            $table->date('task_completion_date')->nullable();
+            $table->longText('description')->nullable();
+            $table->tinyInteger('pay_with')->default(1)->comment('1=COD, 2=Paypal, 3=Stripe');
+            $table->tinyInteger('status')->default(1)->comment('1=Pending, 2=In-Progress, 3=Complete');
             $table->timestamps();
         });
     }

@@ -90,14 +90,15 @@ class PostAssetsController extends BaseController
             $data = PostAssets::getPostAssets($posted_data);
 
             foreach ($data as $key => $value) {
-                delete_files_from_storage($value->filepath);
-                Filepond_Model::deleteRecord($value->filepond_id);
+                delete_files_from_storage($value['filepond']['filepath']);
+                Filepond_Model::deleteRecord($value['filepond']['id']);
                 return $this->sendResponse([], 'Post asset is deleted successfully.');
             }
-            
-            return $this->sendError('Post asset not found OR already deleted.');
+            $error_message['error'] = 'The post asset not found OR already deleted.';
+            return $this->sendError($error_message['error'], $error_message);
         }
         else 
-            return $this->sendError('Something went wrong during query data.');
-    }
+            $error_message['error'] = 'Something went wrong during query data.';
+            return $this->sendError($error_message['error'], $error_message);
+        }
 }

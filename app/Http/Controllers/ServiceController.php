@@ -65,9 +65,20 @@ class ServiceController extends Controller
                     $extension = $request->service_image->getClientOriginalExtension();
                     if($extension == 'jpg' || $extension == 'jpeg' || $extension == 'png'){ 
                         
-                        $file_name = time().'_'.$request->service_image->getClientOriginalName();
-                        $filePath = $request->file('service_image')->storeAs('service_image', $file_name, 'public');
-                        $posted_data['service_image'] = 'storage/service_image/'.$file_name;
+                        // $file_name = time().'_'.$request->service_image->getClientOriginalName();
+                        // $filePath = $request->file('service_image')->storeAs('service_image', $file_name, 'public');
+                        // $posted_data['service_image'] = 'storage/service_image/'.$file_name;
+
+                        $response = upload_files_to_storage($request, $request->service_image, 'service_image');
+
+                        if( isset($response['action']) && $response['action'] == true ) {
+                            $arr = [];
+                            $arr['file_name'] = isset($response['file_name']) ? $response['file_name'] : "";
+                            $arr['file_path'] = isset($response['file_path']) ? $response['file_path'] : "";
+                        }
+                        
+                        $posted_data['service_image'] = $arr['file_path'];
+
                     }else{
                         \Session::flash('error_message', 'Service image format is not correct ( jpg | jpeg | png )!');
                         return redirect()->back()->withInput();   
@@ -82,14 +93,39 @@ class ServiceController extends Controller
     } 
    
     /**
-     * Display the specified resource.
+     * Update the specified resource in storage.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
+    public function ajax_get_services(Request $request) {
+        
+        $posted_data = $request->all();
+
+        if ($request->ajax()) {
+            if ( isset($posted_data['method']) ) unset($posted_data['method']);
+            if ( isset($posted_data['url']) ) unset($posted_data['url']);
+            if ( isset($posted_data['datatype']) ) unset($posted_data['datatype']);
+                
+            // if (!( isset($posted_data['service_id']) && $posted_data['service_id'] != '' && $posted_data['service_id'] != 0 ))
+            //     unset($posted_data['service_id']);
+        }
+        else {
+            // without ajax data here
+        }   
+        
+        $data['services_list'] = $this->ServiceObj->getServices($posted_data);
+        
+        if ($request->ajax()) {
+            if ( isset($posted_data['module']) && $posted_data['module'] == 'services' )
+                return view('service.ajax_services_list', compact('data'));
+            // else
+                // return response()->json(['data' => $data]);
+        }
+        else {
+            return view('service.list', compact('data'));
+        }
     }
 
     /**
@@ -144,7 +180,7 @@ class ServiceController extends Controller
                 
                 $file_name = time().'_'.$request->service_image->getClientOriginalName();
                 $filePath = $request->file('service_image')->storeAs('service_image', $file_name, 'public');
-                $service->service_image = 'storage/service_image/'.$file_name;
+                $service->service_image = 'service_image/'.$file_name;
             }else{
                 \Session::flash('error_message', 'Service image format is not correct ( jpg | jpeg | png )!');
                 return redirect()->back()->withInput();   
