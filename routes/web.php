@@ -111,6 +111,8 @@ Route::get('/payment-success', [PaymentController::class, 'paymentSuccess'])->na
 
 Route::middleware(['auth'])->group(function () {
     
+    Route::get('/profile', [UserController::class, 'profile']);
+
     Route::post('/update_user', [UserController::class, 'update_records']);
     
     Route::post('/get_posts', [PostController::class, 'ajax_get_posts']);

@@ -14,7 +14,7 @@ use App\Models\Setting;
 use Validator;
 use Session;
 use DB;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Laravel\Passport\Token;
 
@@ -67,6 +67,13 @@ class UserController extends Controller
         return view('auth_v1.forgot-password');
     }
 
+    public function profile()
+    {
+       $user = Auth::user();
+       $roles = Role::getRoles();
+        return view('user.profile',compact('user','roles'));
+    }    
+    
     public function logout()
     {
         Auth::logout();
@@ -80,7 +87,8 @@ class UserController extends Controller
         $data['users_count'] = $this->UserObj->getUser($posted_data);
         $data['posts_count'] = $this->PostObj->getPost($posted_data);
         $data['bids_count'] = $this->BidObj->getBids($posted_data);
-        
+        $data['revenue_count'] = $this->PaymentObj->sum('amount_captured');
+      
         return view('dashboard', compact('data'));
     }
     /**
@@ -346,7 +354,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $posted_data = $request->all(); 
-        
+       
         $rules = array(
             'phone_number' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:12',
             'user_role' => 'required',
