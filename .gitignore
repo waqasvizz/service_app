@@ -1,0 +1,13 @@
+# Ignore everything
+/node_modules
+/public/storage
+/storage/app/public
+/vendor
+.env
+
+
+
+# But not these files...
+# !vendor
+# !vendor/rahulhaque
+# !vendor/rahulhaque/**
