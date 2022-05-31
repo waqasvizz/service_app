@@ -212,7 +212,7 @@ class FCM_TokenController extends BaseController
                         $data['device_token'] = 'NULL';
                 }
             }
-            ob_flush();
+            // ob_flush();
 
             return $data;
         }
