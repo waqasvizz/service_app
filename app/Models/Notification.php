@@ -44,9 +44,9 @@ class Notification extends Model
         if (isset($posted_data['slugs'])) {
             $query = $query->where('notifications.slugs', $posted_data['slugs']);
         } else {
-            // $filter = array('new-chat');
-            $filter = array('assign-job', 'new-bid');
-            $query = $query->whereIn('notifications.slugs', $filter);
+            $filter = array('new-chat');
+            // $filter = array('assign-job', 'new-bid');
+            $query = $query->whereNotIn('notifications.slugs', $filter);
         }
 
         if (isset($posted_data['notification_text'])) {
@@ -97,6 +97,12 @@ class Notification extends Model
             // $query->groupBy($posted_data['groupBy_name'], $posted_data['groupBy_value']);
             $query->groupBy($posted_data['groupBy_value']);
         }
+
+        if (isset($posted_data['print_query'])) {
+            $result = $query->toSql();
+            echo '<pre>';print_r($posted_data);'</pre>';
+            echo '<pre>';print_r($result);'</pre>';exit;
+        }
         
         if (isset($posted_data['paginate'])) {
             $result = $query->paginate($posted_data['paginate']);
@@ -110,6 +116,7 @@ class Notification extends Model
                 $result = $query->get();
             }
         }
+
 
         return $result;
     }

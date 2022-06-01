@@ -37,6 +37,9 @@ class NotificationController extends BaseController
         else $params['receiver'] = Auth::user()->id;
                     
         $params['paginate'] = 10;
+        // $params['orderBy_name'] = 'id';
+        // $params['orderBy_value'] = 'DESC';
+        // $params['print_query'] = true;
 
         $notification = Notification::getNotifications($params)->ToArray();
 
