@@ -63,7 +63,7 @@ Route::get('/storage-link', function() {
 Route::get('/queue-work', function() {
     Artisan::call("queue:work");
     return '<h1>queue work activated</h1>';
-});
+}); 
     
 Route::get('/migration-refresh', function() {
     Artisan::call('migrate:refresh');
