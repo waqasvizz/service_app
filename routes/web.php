@@ -53,7 +53,7 @@ Route::get('/site-up', function() {
 Route::get('/run-seeder', function() {
     Artisan::call("db:seed");
     return '<h1>Dummy data added successfully</h1>';
-});
+}); 
 
 Route::get('/storage-link', function() {
     Artisan::call("storage:link");
