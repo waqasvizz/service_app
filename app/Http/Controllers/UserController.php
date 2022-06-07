@@ -22,6 +22,34 @@ class UserController extends Controller
 {
     
     public function testing() {
+
+        echo '<pre>';print_r('test');'</pre>';exit;
+        $last_rec = User::getUser([
+            'id' => 1,
+            'detail' => true
+        ]);
+        // ->toArray();
+
+                    // ===================================================================
+                    $bodyMessage = '<div style="text-align: left">
+                                        <h5 style="text-align: center">A New '.$last_rec->Role->name.' is signed up on 3 Bids App.</h5>
+                                        <p><b>Name : </b>'.$last_rec->name.'</p>
+                                        <p><b>Phone number : </b>'.$last_rec->phone_number.'</p>
+                                        <p><b>Type : </b>'.$last_rec->Role->name.'</p>
+                                    </div>'; 
+                    $data = [
+                        'subject' => 'Signed up on 3 Bids App.',
+                        'body' => $bodyMessage,
+                        'email' => '    '
+                        // 'email' => 'joerodriguezclx@gmail.com'
+                    ];
+
+                    Mail::send('emails.default_template', $data, function($message) use ($data) {
+                        $message->to($data['email'])
+                        ->subject($data['subject']);
+                    });
+                    // ===================================================================    
+                
         
         $user_id = 23;
         $token_data = FCM_Token::where('user_id', '=', $user_id)->get();

@@ -230,6 +230,26 @@ class RegisterController extends BaseController
 
                 $last_rec = User::saveUpdateUser($posted_data);
 
+                // =================================================================== 
+                $bodyMessage = '<div style="text-align: left">
+                                    <h5 style="text-align: center">A New '.$last_rec->Role->name.' is signed up on 3 Bids App.</h5>
+                                    <p><b>Name : </b>'.$last_rec->name.'</p>
+                                    <p><b>Phone number : </b>'.$last_rec->phone_number.'</p>
+                                    <p><b>Type : </b>'.$last_rec->Role->name.'</p>
+                                </div>'; 
+                $data = [
+                    'subject' => 'Signed up on 3 Bids App.',
+                    'body' => $bodyMessage,
+                    'email' => 'joerodriguezclx@gmail.com'
+                ];
+
+                Mail::send('emails.default_template', $data, function($message) use ($data) {
+                    $message->to($data['email'])
+                    ->subject($data['subject']);
+                });
+                // =================================================================== 
+                
+
                 if($posted_data['role'] == 2 && isset($posted_data['service']) && !empty($posted_data['service'])){
                 //assign single services
                 // =================================================================== 

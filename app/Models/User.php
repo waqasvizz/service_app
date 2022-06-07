@@ -282,6 +282,11 @@ class User extends Authenticatable
             $data->no_of_jobs_completed = $posted_data['no_of_jobs_completed'];
         }
         $data->save();
+        $data = User::getUser([
+            'id' => $data->id,
+            'detail' => true
+        ]);
+
         return $data;
     }
 
