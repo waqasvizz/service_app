@@ -24,7 +24,7 @@ use App\Http\Controllers\BidController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+ 
 Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     Artisan::call('optimize');
