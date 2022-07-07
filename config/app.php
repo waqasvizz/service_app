@@ -41,7 +41,7 @@ return [
 
     // 'debug' => (bool) env('APP_DEBUG', false),
 
-    'debug' => env('APP_ENV')=='local'? true:false,
+    'debug' => env('APP_ENV')=='local'? true:true,
 
     /*
     |--------------------------------------------------------------------------
@@ -59,15 +59,15 @@ return [
     // 'asset_url' => env('ASSET_URL', null),
 
 
+    'url' => env('APP_URL', 'http://localhost'),
 
-    // 'url' => env('APP_URL', 'http://localhost:8000'),
+    'asset_url' => env('ASSET_URL', null),
 
+
+    // 'url' => env('APP_ENV') == 'local' ? 'http://localhost:8000' : 'http://3bidsapp.com/public/',
+
+    // 'asset_url' => env('APP_ENV') == 'local' ? '' : 'http://3bidsapp.com',
     // 'asset_url' => env('ASSET_URL', null),
-
-
-    'url' => env('APP_ENV') == 'local' ? 'http://localhost:8000' : 'http://3bidsapp.com/public/',
-
-    'asset_url' => env('APP_ENV') == 'local' ? '' : 'http://3bidsapp.com/public/',
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

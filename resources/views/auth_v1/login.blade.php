@@ -52,7 +52,7 @@
 <p class="text-center mt-2">
     <span>New on our platform?</span>
     <a href="{{ route('register') }}">
-        <span>Create an account</span>
+        <span>Create account</span>
     </a>
 </p>
 

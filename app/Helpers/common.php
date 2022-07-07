@@ -2,24 +2,21 @@
 
 if (! function_exists('is_image_exist')) {
     function is_image_exist($image_path = '') {
-        
-        $base_url = public_path().'/storage/'.$image_path;
-        $asset_url = config('app.url').'/storage/';
-        $image_url = $asset_url.$image_path;
-
-        // return  $image_url;
+        $storage_base_url = public_path().'/storage/'.$image_path;
+        $public_base_url = str_replace("/storage","",$storage_base_url);
 
         $default_img_name = 'default-thumbnail.jpg';
- 
-        
+
         if ( $image_path == '' || is_null($image_path) )
-            return config('app.url').'/storage/default-images/'.$default_img_name;
-        else if (file_exists($_SERVER['DOCUMENT_ROOT'].'/'.$image_path))
-            return config('app.url').'/storage/'.$image_path;
-        else if (file_exists($base_url))
-            return config('app.url').'/storage/'.$image_path;
+            $imageUrl = asset('app-assets/images/default-images/'.$default_img_name);
+        else if (file_exists($storage_base_url))
+            $imageUrl = asset('storage/'.$image_path);
+        else if (file_exists($public_base_url))
+            $imageUrl = asset($image_path);
         else
-            return config('app.url').'/storage/default-images/'.$default_img_name;
+            $imageUrl = asset('app-assets/images/default-images/'.$default_img_name);
+
+        return $imageUrl;
     }
 }
 

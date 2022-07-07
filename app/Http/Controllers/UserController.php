@@ -614,7 +614,7 @@ class UserController extends Controller
         $credentials['role'] = 1;
 
         if (Auth::attempt($credentials)) {
-            return redirect('/admin');
+            return redirect('/dashboard');
         }else{
             return back()->withErrors([
                 'email' => 'The provided credentials do not match our records.',

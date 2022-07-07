@@ -24,7 +24,7 @@ use App\Http\Controllers\BidController;
 | contains the "web" middleware group. Now create something great!
 |
 */
- 
+
 Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     Artisan::call('optimize');
@@ -123,7 +123,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/filepond_record_get', [FilepondController::class, 'get_records']);
     Route::get('/filepond_record_destroy', [FilepondController::class, 'destroy_records']);
-    Route::get('/admin', [UserController::class, 'dashboard']);
+    Route::get('/dashboard', [UserController::class, 'dashboard']);
 
     //resouce routes
     Route::resource('service', ServiceController::class);

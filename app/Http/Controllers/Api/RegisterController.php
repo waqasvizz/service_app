@@ -374,7 +374,7 @@ class RegisterController extends BaseController
     {
         $posted_data = $request->all();
         $rules = array(
-            'profile_id' => 'required',
+            'profile_id' => 'required|exists:users,id',
             'first_name' => 'nullable|max:50',
             'last_name' => 'nullable|max:50',
             'phone_number' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/',
@@ -382,7 +382,7 @@ class RegisterController extends BaseController
             // 'profile_image' => 'nullable',
             'latitude' => 'nullable',
             'longitude' => 'nullable',
-            'service' => 'nullable',
+            'service' => 'nullable|exists:services,id,deleted_at,NULL',
         );
         
         $messages = array(
@@ -466,6 +466,7 @@ class RegisterController extends BaseController
                 $posted_data['update_id'] = $posted_data['profile_id'];
                 $last_rec = User::saveUpdateUser($posted_data);
 
+
                 if(isset($posted_data['service']) && !empty($posted_data['service'])){
 
                     //assign single services
@@ -482,6 +483,9 @@ class RegisterController extends BaseController
                     if($AssignService){
                         $service = Service::find($posted_data['service']);
                         $AssignService->service()->associate($service)->save();
+
+                        // $user = User::find($last_rec->id);
+                        // $AssignService->user()->associate($user)->save();
 
                     }else{
                         $user = User::find($last_rec->id);

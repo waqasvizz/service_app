@@ -68,7 +68,7 @@
                                     <i data-feather="dollar-sign" class="font-medium-5"></i>
                                 </div>
                             </div>
-                            <h2 class="font-weight-bolder mt-1">${{ isset($data['revenue_count']) ? $data['revenue_count']: 0 }}</h2>
+                            <h2 class="font-weight-bolder mt-1">${{ isset($data['revenue_count']) ? round($data['revenue_count'],2): 0 }}</h2>
                             <p class="card-text mb-1">Revenue</p>
                         </div>
                         <div id="order-chart"></div>
